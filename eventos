@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Simule Seu Evento | Prime Estrutura</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#f0b429;--gold-dark:#c8901a;--bg:#0d0d0d;--surface:#1a1a1a;--surface2:#242424;--border:#333;--text:#f0f0f0;--muted:#888;--radius:14px}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.header{background:linear-gradient(135deg,#111 0%,#1a1400 100%);border-bottom:1px solid #2a2000;padding:18px 24px;display:flex;align-items:center;gap:14px}
+.header-logo{font-size:1.5rem;font-weight:800;color:var(--gold)}
+.header-sub{font-size:.8rem;color:var(--muted);margin-top:2px}
+.steps-bar{background:#111;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:center;gap:0}
+.step{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted)}
+.step.active{color:var(--gold)}
+.step.done{color:#4caf50}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700}
+.step.active .step-num{border-color:var(--gold);background:#f0b42922;color:var(--gold)}
+.step.done .step-num{border-color:#4caf50;background:#4caf5022;color:#4caf50}
+.step-line{width:40px;height:2px;background:var(--border);margin:0 4px}
+.step-line.done{background:#4caf50}
+.main{max-width:680px;margin:0 auto;padding:28px 20px 60px}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.page-title{font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:6px}
+.page-title span{color:var(--gold)}
+.page-sub{color:var(--muted);font-size:.9rem;margin-bottom:28px;line-height:1.5}
+.section{margin-bottom:28px}
+.section-label{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.input-group{display:flex;flex-direction:column;gap:14px}
+.input-row{display:flex;gap:12px}
+.input-row .field{flex:1}
+.field label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:6px;font-weight:600}
+.field input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:.95rem;padding:12px 14px;transition:border-color .2s;outline:none;-webkit-appearance:none;appearance:none}
+.field input:focus{border-color:var(--gold)}
+.btn-group{display:flex;flex-wrap:wrap;gap:10px}
+.btn-opt{padding:10px 18px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:.88rem;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:7px}
+.btn-opt:hover{border-color:var(--gold)}
+.btn-opt.selected{border-color:var(--gold);background:#f0b42918;color:var(--gold)}
+.range-wrap{padding:4px 0}
+.range-label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.range-val{font-size:1.1rem;font-weight:800;color:var(--gold)}
+.range-sub{font-size:.78rem;color:var(--muted)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:var(--surface2);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--gold);border:3px solid #0d0d0d;box-shadow:0 0 0 3px #f0b42933;cursor:pointer}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--gold);border:3px solid #0d0d0d;cursor:pointer}
+.range-marks{display:flex;justify-content:space-between;margin-top:6px;padding:0 2px}
+.range-marks span{font-size:.72rem;color:var(--muted)}
+.check-group{display:flex;flex-direction:column;gap:10px}
+.check-item{display:flex;align-items:flex-start;gap:12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .2s}
+.check-item:hover{border-color:var(--gold)}
+.check-item.selected{border-color:var(--gold);background:#f0b42910}
+.check-box{width:20px;height:20px;min-width:20px;border-radius:5px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .2s}
+.check-item.selected .check-box{background:var(--gold);border-color:var(--gold)}
+.check-box svg{display:none}
+.check-item.selected .check-box svg{display:block}
+.check-info{flex:1}
+.check-title{font-size:.9rem;font-weight:700;color:var(--text)}
+.check-desc{font-size:.78rem;color:var(--muted);margin-top:2px;line-height:1.4}
+.divider{border:none;border-top:1px solid var(--border);margin:24px 0}
+.btn-primary{width:100%;padding:15px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:12px;color:#0d0d0d;font-size:1rem;font-weight:800;cursor:pointer;letter-spacing:.3px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px #f0b42940}
+.btn-back{background:none;border:none;color:var(--muted);font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:5px;margin-bottom:20px;padding:6px 0}
+.btn-back:hover{color:var(--text)}
+.btn-whatsapp{width:100%;padding:16px;background:linear-gradient(135deg,#25d366,#128c7e);border:none;border-radius:12px;color:#fff;font-size:1.05rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;margin-top:10px}
+.btn-whatsapp:hover{transform:translateY(-2px);box-shadow:0 8px 24px #25d36650}
+.summary-hero{background:linear-gradient(135deg,#1a1400 0%,#0d0d0d 100%);border:1.5px solid #2a2000;border-radius:16px;padding:24px;margin-bottom:24px;text-align:center}
+.summary-event-name{font-size:1.6rem;font-weight:900;color:var(--gold);margin-bottom:4px}
+.summary-event-type{font-size:.9rem;color:var(--muted)}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.summary-chip{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:left}
+.summary-chip-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.summary-chip-val{font-size:.92rem;font-weight:700;color:var(--text);margin-top:2px}
+.selected-items{margin-bottom:22px}
+.selected-items-title{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px}
+.item-list{display:flex;flex-direction:column;gap:8px}
+.item-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)}
+.item-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.item-name{font-size:.88rem;font-weight:600}
+.item-sub{font-size:.75rem;color:var(--muted)}
+.investment-box{background:linear-gradient(135deg,#1a1400,#111);border:2px solid var(--gold);border-radius:16px;padding:22px 24px;text-align:center;margin-bottom:18px}
+.investment-label{font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.investment-val{font-size:2.2rem;font-weight:900;color:var(--gold);line-height:1}
+.investment-sub{font-size:.78rem;color:var(--muted);margin-top:6px}
+.combo-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#0d0d0d;font-size:.78rem;font-weight:800;padding:4px 12px;border-radius:20px;margin-top:8px}
+.banda-tip{background:#1a1530;border:1.5px solid #6b5ce7;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start}
+.banda-tip-text{font-size:.83rem;color:#c4b5fd;line-height:1.5}
+.banda-tip-text strong{color:#a78bfa}
+.combo-hint{color:var(--gold);font-size:.8rem;margin-bottom:14px;background:#1a1400;border:1px solid #2a2000;border-radius:8px;padding:10px 12px;display:none}
+.error-msg{color:#f87171;font-size:.8rem;margin-top:8px;display:none}
+.error-msg.show{display:block}
+.disclaimer{font-size:.75rem;color:var(--muted);text-align:center;line-height:1.5;margin-top:14px}
+@media(max-width:480px){.input-row{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">&#9889; Prime Estrutura</div>
+    <div class="header-sub">Soluções completas para eventos</div>
+  </div>
+</div>
+
+<div class="steps-bar">
+  <div class="step active" id="s1"><div class="step-num">1</div><span>Seu Evento</span></div>
+  <div class="step-line" id="sl1"></div>
+  <div class="step" id="s2"><div class="step-num">2</div><span>Estrutura</span></div>
+  <div class="step-line" id="sl2"></div>
+  <div class="step" id="s3"><div class="step-num">3</div><span>Simulação</span></div>
+</div>
+
+<div class="main">
+
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+  <div class="page-title">&#127914; <span>Simule</span> seu Evento</div>
+  <div class="page-sub">Preencha as informações básicas para montar a estrutura ideal do seu evento.</div>
+
+  <div class="section">
+    <div class="section-label">&#128100; Seus dados</div>
+    <div class="input-group">
+      <div class="field">
+        <label>Nome completo *</label>
+        <input type="text" id="nome" placeholder="Ex: João Silva" autocomplete="name"/>
+      </div>
+      <div class="input-row">
+        <div class="field">
+          <label>Cidade *</label>
+          <input type="text" id="cidade" placeholder="Ex: Três Corações"/>
+        </div>
+        <div class="field">
+          <label>Data do evento *</label>
+          <input type="date" id="data_evento"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Horário de início</label>
+        <input type="time" id="hora_evento" value="20:00"/>
+      </div>
+    </div>
+    <div class="error-msg" id="err1">&#9888;&#65039; Preencha nome, cidade e data do evento.</div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <div class="section-label">&#127881; Tipo de evento</div>
+    <div class="btn-group" id="tipo_evento">
+      <button class="btn-opt" data-val="casamento" onclick="selGroup('tipo_evento',this)">&#128141; Casamento</button>
+      <button class="btn-opt" data-val="aniversario" onclick="selGroup('tipo_evento',this)">&#127874; Aniversário</button>
+      <button class="btn-opt" data-val="festa_show" onclick="selGroup('tipo_evento',this)">&#127926; Festa / Show</button>
+      <button class="btn-opt" data-val="corporativo" onclick="selGroup('tipo_evento',this)">&#127970; Corporativo</button>
+    </div>
+    <div class="error-msg" id="err_tipo">&#9888;&#65039; Selecione o tipo de evento.</div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <div class="section-label">&#128101; Convidados esperados</div>
+    <div class="range-wrap">
+      <div class="range-label-row">
+        <span class="range-sub">Arraste para selecionar</span>
+        <span class="range-val"><span id="val_pessoas">150</span> pessoas</span>
+      </div>
+      <input type="range" id="pessoas" min="50" max="1000" step="10" value="150" oninput="document.getElementById('val_pessoas').textContent=this.value"/>
+      <div class="range-marks"><span>50</span><span>250</span><span>500</span><span>750</span><span>1000</span></div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <div class="section-label">&#9201;&#65039; Duração do evento</div>
+    <div class="range-wrap">
+      <div class="range-label-row">
+        <span class="range-sub">Tempo total do evento</span>
+        <span class="range-val"><span id="val_duracao">4</span>h</span>
+      </div>
+      <input type="range" id="duracao" min="2" max="12" step="1" value="4" oninput="document.getElementById('val_duracao').textContent=this.value"/>
+      <div class="range-marks"><span>2h</span><span>4h</span><span>6h</span><span>8h</span><span>10h</span><span>12h</span></div>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="goPage2()">Continuar &#8594;</button>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+  <button class="btn-back" onclick="goPage(1)">&#8592; Voltar</button>
+  <div class="page-title">&#127959;&#65039; <span>Estrutura</span> do Evento</div>
+  <div class="page-sub">Defina como será o ambiente e os equipamentos para o seu evento.</div>
+
+  <div class="section">
+    <div class="section-label">&#127807; Ambiente do evento</div>
+    <div class="btn-group" id="ambiente">
+      <button class="btn-opt" data-val="interno" onclick="selGroup('ambiente',this)">&#127968; Interno (fechado)</button>
+      <button class="btn-opt" data-val="externo" onclick="selGroup('ambiente',this)">&#127795; Externo (ao ar livre)</button>
+    </div>
+    <div class="error-msg" id="err_ambiente">&#9888;&#65039; Selecione o ambiente.</div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <div class="section-label">&#128208; Tamanho do espaço</div>
+    <div class="btn-group" id="tamanho">
+      <button class="btn-opt" data-val="pequeno" onclick="selGroup('tamanho',this)">&#128310; Pequeno <small style="color:var(--muted)">&nbsp;até 80m²</small></button>
+      <button class="btn-opt" data-val="medio" onclick="selGroup('tamanho',this)">&#128311; Médio <small style="color:var(--muted)">&nbsp;80–300m²</small></button>
+      <button class="btn-opt" data-val="grande" onclick="selGroup('tamanho',this)">&#128312; Grande <small style="color:var(--muted)">&nbsp;+300m²</small></button>
+    </div>
+    <div class="error-msg" id="err_tamanho">&#9888;&#65039; Selecione o tamanho.</div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <div class="section-label">&#11088; Nível do evento</div>
+    <div class="btn-group" id="nivel">
+      <button class="btn-opt" data-val="basico" onclick="selGroup('nivel',this)">&#10024; Básico</button>
+      <button class="btn-opt" data-val="intermediario" onclick="selGroup('nivel',this)">&#11088; Intermediário</button>
+      <button class="btn-opt" data-val="premium" onclick="selGroup('nivel',this)">&#128081; Premium</button>
+    </div>
+    <div class="error-msg" id="err_nivel">&#9888;&#65039; Selecione o nível.</div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <div class="section-label">&#127925; Tipo de som</div>
+    <div class="btn-group" id="som">
+      <button class="btn-opt" data-val="dj" onclick="selGroup('som',this)">&#127911; DJ</button>
+      <button class="btn-opt" data-val="banda" onclick="selGroup('som',this)">&#127928; Banda ao vivo</button>
+      <button class="btn-opt" data-val="dj_banda" onclick="selGroup('som',this)">&#127908; DJ + Banda</button>
+    </div>
+    <div class="error-msg" id="err_som">&#9888;&#65039; Selecione o tipo de som.</div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <div class="section-label">&#10133; Adicionais <span style="color:var(--muted);font-weight:400;text-transform:none;font-size:.75rem">(opcional)</span></div>
+    <div class="check-group">
+      <div class="check-item" id="chk_led" onclick="toggleCheck('led',this)">
+        <div class="check-box"><svg width="12" height="10" viewBox="0 0 12 10"><path d="M1 5L4.5 8.5L11 1.5" stroke="#0d0d0d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-info">
+          <div class="check-title">&#128250; Painel de LED 4×2m</div>
+          <div class="check-desc">Impacto visual e identidade do evento — tamanho sugerido 4×2m</div>
+        </div>
+      </div>
+      <div class="check-item" id="chk_pista" onclick="toggleCheck('pista',this)">
+        <div class="check-box"><svg width="12" height="10" viewBox="0 0 12 10"><path d="M1 5L4.5 8.5L11 1.5" stroke="#0d0d0d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-info">
+          <div class="check-title">&#128131; Pista Paris 4×4m</div>
+          <div class="check-desc">Pista de dança elegante e resistente — 4×4m</div>
+        </div>
+      </div>
+      <div class="check-item" id="chk_iluminacao" onclick="toggleCheck('iluminacao',this)">
+        <div class="check-box"><svg width="12" height="10" viewBox="0 0 12 10"><path d="M1 5L4.5 8.5L11 1.5" stroke="#0d0d0d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-info">
+          <div class="check-title">&#128161; Iluminação Profissional</div>
+          <div class="check-desc">Moving heads, par cans e efeitos cênicos especiais</div>
+        </div>
+      </div>
+    </div>
+    <div class="combo-hint" id="combo_hint">&#127873; Selecione os 3 adicionais e ganhe <strong>5% de desconto</strong> — <strong>Combo Prime+</strong>!</div>
+  </div>
+
+  <button class="btn-primary" onclick="gerarSimulacao()">&#127919; Gerar Simulação</button>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="page3">
+  <button class="btn-back" onclick="goPage(2)">&#8592; Voltar</button>
+  <div class="page-title">&#127882; Sua <span>Simulação</span></div>
+  <div class="page-sub">Confira o resumo e solicite seu orçamento oficial pelo WhatsApp!</div>
+
+  <div class="summary-hero">
+    <div class="summary-event-name" id="sum_nome">—</div>
+    <div class="summary-event-type" id="sum_tipo">—</div>
+    <div class="summary-grid">
+      <div class="summary-chip"><div class="summary-chip-label">&#128197; Data</div><div class="summary-chip-val" id="sum_data">—</div></div>
+      <div class="summary-chip"><div class="summary-chip-label">&#128205; Cidade</div><div class="summary-chip-val" id="sum_cidade">—</div></div>
+      <div class="summary-chip"><div class="summary-chip-label">&#128101; Convidados</div><div class="summary-chip-val" id="sum_pessoas">—</div></div>
+      <div class="summary-chip"><div class="summary-chip-label">&#9201; Duração</div><div class="summary-chip-val" id="sum_duracao">—</div></div>
+      <div class="summary-chip"><div class="summary-chip-label">&#127807; Ambiente</div><div class="summary-chip-val" id="sum_ambiente">—</div></div>
+      <div class="summary-chip"><div class="summary-chip-label">&#128208; Espaço</div><div class="summary-chip-val" id="sum_tamanho">—</div></div>
+    </div>
+  </div>
+
+  <div class="selected-items">
+    <div class="selected-items-title">&#127919; Itens da sua estrutura</div>
+    <div class="item-list" id="item_list"></div>
+  </div>
+
+  <div class="banda-tip" id="banda_tip" style="display:none">
+    <div style="font-size:1.2rem">&#127928;</div>
+    <div class="banda-tip-text"><strong>Sugestão Prime Banda Show:</strong> Para eventos com banda ao vivo, temos parceria com a <strong>Prime Banda Show</strong> — solicite mais detalhes ao pedir seu orçamento!</div>
+  </div>
+
+  <div class="investment-box">
+    <div class="investment-label">&#128176; Estimativa de investimento</div>
+    <div class="investment-val" id="sum_total">—</div>
+    <div id="combo_badge_wrap"></div>
+    <div class="investment-sub">*Valor estimado. Orçamento final confirmado pelo fornecedor.</div>
+  </div>
+
+  <button class="btn-whatsapp" onclick="abrirWhatsApp()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    Pedir Orçamento pelo WhatsApp
+  </button>
+  <p class="disclaimer">Ao clicar, você será redirecionado ao WhatsApp da Prime Estrutura com todos os dados do evento preenchidos automaticamente.</p>
+</div>
+
+</div>
+
+<script>
+var state={nome:'',cidade:'',data_evento:'',hora_evento:'',tipo_evento:'',pessoas:150,duracao:4,ambiente:'',tamanho:'',nivel:'',som:'',adicionais:[]};
+
+function selGroup(group,el){
+  document.querySelectorAll('#'+group+' .btn-opt').forEach(function(b){b.classList.remove('selected')});
+  el.classList.add('selected');
+  state[group]=el.dataset.val;
+  updateComboHint();
+}
+
+function toggleCheck(key,el){
+  el.classList.toggle('selected');
+  if(el.classList.contains('selected')){if(!state.adicionais.includes(key))state.adicionais.push(key)}
+  else{state.adicionais=state.adicionais.filter(function(k){return k!==key})}
+  updateComboHint();
+}
+
+function updateComboHint(){
+  var h=document.getElementById('combo_hint');
+  h.style.display=state.adicionais.length>=2?'block':'none';
+}
+
+function goPage(n){
+  document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i+1===n)});
+  for(var i=1;i<=3;i++){
+    var s=document.getElementById('s'+i);
+    s.classList.remove('active','done');
+    if(i<n)s.classList.add('done');
+    else if(i===n)s.classList.add('active');
+    if(i<3){var sl=document.getElementById('sl'+i);sl.classList.toggle('done',i<n)}
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goPage2(){
+  state.nome=document.getElementById('nome').value.trim();
+  state.cidade=document.getElementById('cidade').value.trim();
+  state.data_evento=document.getElementById('data_evento').value;
+  state.hora_evento=document.getElementById('hora_evento').value;
+  state.pessoas=parseInt(document.getElementById('pessoas').value);
+  state.duracao=parseInt(document.getElementById('duracao').value);
+  var ok=true;
+  if(!state.nome||!state.cidade||!state.data_evento){document.getElementById('err1').classList.add('show');ok=false}
+  else{document.getElementById('err1').classList.remove('show')}
+  if(!state.tipo_evento){document.getElementById('err_tipo').classList.add('show');ok=false}
+  else{document.getElementById('err_tipo').classList.remove('show')}
+  if(ok)goPage(2);
+}
+
+function gerarSimulacao(){
+  var ok=true;
+  ['ambiente','tamanho','nivel','som'].forEach(function(f){
+    var el=document.getElementById('err_'+f);
+    if(!state[f]){el.classList.add('show');ok=false}else{el.classList.remove('show')}
+  });
+  if(ok){buildSummary();goPage(3)}
+}
+
+function calcPrice(){
+  var nivel=state.nivel,pessoas=state.pessoas,ambiente=state.ambiente,som=state.som,adicionais=state.adicionais;
+  var ext=ambiente==='externo'?1.3:1.0;
+  var sound=0;
+  if(nivel==='basico'){
+    var base=pessoas<=100?1000:pessoas<=200?1400:pessoas<=350?1800:2200;
+    sound=Math.round(base*ext/50)*50;
+  }else if(nivel==='intermediario'){
+    sound=Math.round(1500*ext/50)*50;
+  }else{
+    sound=Math.round(3750*ext/50)*50;
+  }
+  if(som==='banda')sound+=800;
+  if(som==='dj_banda')sound+=1200;
+  var total=sound;
+  if(adicionais.includes('led'))total+=1750;
+  if(adicionais.includes('pista'))total+=1200;
+  if(adicionais.includes('iluminacao'))total+=1200;
+  var isCombo=adicionais.length>=3;
+  if(isCombo)total=Math.round(total*0.95);
+  return{total:total,isCombo:isCombo};
+}
+
+var LBL={
+  tipo:{casamento:'&#128141; Casamento',aniversario:'&#127874; Aniversário',festa_show:'&#127926; Festa / Show',corporativo:'&#127970; Corporativo'},
+  ambiente:{interno:'&#127968; Interno',externo:'&#127795; Externo'},
+  tamanho:{pequeno:'&#128310; Pequeno (até 80m²)',medio:'&#128311; Médio (80–300m²)',grande:'&#128312; Grande (+300m²)'},
+  nivel:{basico:'&#10024; Básico',intermediario:'&#11088; Intermediário',premium:'&#128081; Premium'},
+  som:{dj:'&#127911; DJ',banda:'&#127928; Banda ao vivo',dj_banda:'&#127908; DJ + Banda'},
+  adic:{led:'&#128250; Painel de LED 4×2m',pista:'&#128131; Pista Paris 4×4m',iluminacao:'&#128161; Iluminação Profissional'}
+};
+
+function fmtDate(d){if(!d)return'—';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+
+function buildSummary(){
+  document.getElementById('sum_nome').textContent=state.nome;
+  document.getElementById('sum_tipo').innerHTML=LBL.tipo[state.tipo_evento]||'—';
+  document.getElementById('sum_data').textContent=fmtDate(state.data_evento)+(state.hora_evento?' às '+state.hora_evento:'');
+  document.getElementById('sum_cidade').textContent=state.cidade;
+  document.getElementById('sum_pessoas').textContent=state.pessoas+' pessoas';
+  document.getElementById('sum_duracao').textContent=state.duracao+'h';
+  document.getElementById('sum_ambiente').innerHTML=LBL.ambiente[state.ambiente];
+  document.getElementById('sum_tamanho').innerHTML=LBL.tamanho[state.tamanho];
+
+  var items=[];
+  items.push({name:'Sistema de Som — '+state.nivel.charAt(0).toUpperCase()+state.nivel.slice(1),sub:LBL.som[state.som]});
+  if(state.adicionais.includes('led'))items.push({name:'Painel de LED 4×2m',sub:''});
+  if(state.adicionais.includes('pista'))items.push({name:'Pista Paris 4×4m',sub:''});
+  if(state.adicionais.includes('iluminacao'))items.push({name:'Iluminação Profissional',sub:''});
+
+  document.getElementById('item_list').innerHTML=items.map(function(it){
+    return '<div class="item-row"><div class="item-dot"></div><div><div class="item-name">'+it.name+'</div>'+(it.sub?'<div class="item-sub">'+it.sub+'</div>':'')+'</div></div>';
+  }).join('');
+
+  var r=calcPrice();
+  var fmt=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0,maximumFractionDigits:0}).format(r.total);
+  document.getElementById('sum_total').textContent=fmt;
+  document.getElementById('combo_badge_wrap').innerHTML=r.isCombo?'<div class="combo-badge">&#9889; Combo Prime+ — 5% de desconto aplicado!</div>':'';
+  document.getElementById('banda_tip').style.display=(state.som==='banda'||state.som==='dj_banda')?'flex':'none';
+}
+
+function abrirWhatsApp(){
+  var r=calcPrice();
+  var fmt=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0,maximumFractionDigits:0}).format(r.total);
+  var adics=state.adicionais.map(function(a){return({led:'Painel de LED 4x2m',pista:'Pista Paris 4x4m',iluminacao:'Iluminação Profissional'})[a]}).join(', ')||'Nenhum';
+  var combo=r.isCombo?'\n✅ *Combo Prime+* — Desconto de 5% aplicado!':'';
+  var nivelLabel={basico:'Básico',intermediario:'Intermediário',premium:'Premium'};
+  var somLabel={dj:'DJ',banda:'Banda ao vivo',dj_banda:'DJ + Banda'};
+  var ambLabel={interno:'Interno (fechado)',externo:'Externo (ao ar livre)'};
+  var tamLabel={pequeno:'Pequeno (até 80m²)',medio:'Médio (80-300m²)',grande:'Grande (+300m²)'};
+  var tipoLabel={casamento:'Casamento',aniversario:'Aniversário',festa_show:'Festa / Show',corporativo:'Corporativo'};
+  var msg='Olá! Fiz a simulação do meu evento no site da Prime Estrutura e gostaria de solicitar um orçamento oficial.\n\n'
+    +'━━━━━━━━━━━━━━━━━━━━\n'
+    +'👤 *Nome:* '+state.nome+'\n'
+    +'📍 *Cidade:* '+state.cidade+'\n'
+    +'📅 *Data:* '+fmtDate(state.data_evento)+(state.hora_evento?' às '+state.hora_evento:'')+'\n'
+    +'━━━━━━━━━━━━━━━━━━━━\n'
+    +'🎉 *Tipo de evento:* '+tipoLabel[state.tipo_evento]+'\n'
+    +'👥 *Convidados:* '+state.pessoas+' pessoas\n'
+    +'⏱️ *Duração:* '+state.duracao+' horas\n'
+    +'🌿 *Ambiente:* '+ambLabel[state.ambiente]+'\n'
+    +'📐 *Tamanho do espaço:* '+tamLabel[state.tamanho]+'\n'
+    +'⭐ *Nível do evento:* '+nivelLabel[state.nivel]+'\n'
+    +'🎵 *Tipo de som:* '+somLabel[state.som]+'\n'
+    +'➕ *Adicionais:* '+adics+'\n'
+    +'━━━━━━━━━━━━━━━━━━━━\n'
+    +'💰 *Estimativa simulada:* '+fmt+combo+'\n'
+    +'━━━━━━━━━━━━━━━━━━━━\n'
+    +'Aguardo o retorno com o orçamento oficial! 😊';
+  window.open('https://wa.me/5535991565909?text='+encodeURIComponent(msg),'_blank');
+}
+</script>
+</body>
+</html>
