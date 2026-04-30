@@ -3,201 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Eventos</title>
+    <title>Simulador de Orçamento</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        :root {
-            --primary: #1a1a1a;
-            --accent: #D4AF37;
-            --bg: #ffffff;
-            --input-bg: #f8f9fa;
-            --border: #e0e0e0;
-        }
-
+        :root { --primary: #1a1a1a; --accent: #D4AF37; --bg: #ffffff; --input-bg: #f8f9fa; --border: #e0e0e0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
-
-        body {
-            background-color: #f0f2f5;
-            color: var(--primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .app-container {
-            background-color: var(--bg);
-            width: 100%;
-            max-width: 480px;
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
-            border: 1px solid var(--border);
-        }
-
-        .header {
-            padding: 40px 20px;
-            text-align: center;
-            background: #fff;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .header h1 { 
-            font-size: 18px; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            letter-spacing: 2px;
-            color: var(--primary);
-        }
-
+        body { background-color: #f0f2f5; color: var(--primary); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .app-container { background-color: var(--bg); width: 100%; max-width: 480px; border-radius: 28px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .header { padding: 40px 20px; text-align: center; background: #fff; border-bottom: 1px solid var(--border); }
+        .header h1 { font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
         .step { display: none; padding: 35px; animation: fadeIn 0.4s ease-out; }
         .step.active { display: block; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        label { display: block; margin-bottom: 12px; font-weight: 700; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-
-        input[type="text"], input[type="date"], input[type="time"], select, .input-full {
-            width: 100%;
-            padding: 18px;
-            background: var(--input-bg);
-            border: 2px solid var(--border);
-            color: var(--primary);
-            border-radius: 14px;
-            margin-bottom: 25px;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        input:focus { border-color: var(--accent); background: #fff; outline: none; }
-
+        label { display: block; margin-bottom: 12px; font-weight: 700; font-size: 12px; color: #888; text-transform: uppercase; }
+        input[type="text"], .input-full { width: 100%; padding: 18px; background: var(--input-bg); border: 2px solid var(--border); border-radius: 14px; margin-bottom: 25px; font-size: 16px; }
         .grid-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .btn-option {
-            padding: 20px 15px;
-            border: 2px solid var(--border);
-            background: #fff;
-            color: var(--primary);
-            border-radius: 14px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s;
-            text-align: center;
-            font-weight: 600;
-        }
+        .btn-option { padding: 20px 15px; border: 2px solid var(--border); background: #fff; border-radius: 14px; cursor: pointer; font-size: 14px; text-align: center; font-weight: 600; }
         .btn-option.selected { border-color: var(--accent); background: #fffdf5; color: var(--accent); }
-
-        .slider-label { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; font-size: 15px; }
-        input[type="range"] { width: 100%; accent-color: var(--accent); margin-bottom: 35px; cursor: pointer; }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            background: var(--input-bg);
-            padding: 18px;
-            border-radius: 14px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: 0.3s;
-        }
+        .slider-label { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
+        input[type="range"] { width: 100%; accent-color: var(--accent); margin-bottom: 35px; }
+        .checkbox-item { display: flex; align-items: center; background: var(--input-bg); padding: 18px; border-radius: 14px; margin-bottom: 12px; cursor: pointer; border: 2px solid transparent; }
         .checkbox-item.selected { border-color: var(--accent); background: #fffdf5; }
         .checkbox-item input { margin-right: 15px; transform: scale(1.3); accent-color: var(--accent); }
-
-        .btn-next {
-            width: 100%;
-            padding: 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-
+        .btn-next { width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 16px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
         .btn-whatsapp { background: #25d366; margin-top: 15px; }
-
-        .summary-card { background: #fdfdfd; padding: 25px; border-radius: 20px; border: 1px solid var(--border); border-left: 6px solid var(--accent); line-height: 1.6; }
-        .total-display { text-align: center; padding: 40px 0 20px; }
-        .total-display strong { font-size: 42px; color: var(--primary); display: block; margin-top: 10px; }
-
-        .footer-brand { text-align: center; padding: 30px; font-size: 11px; color: #bbb; letter-spacing: 1px; }
+        .summary-card { background: #fdfdfd; padding: 25px; border-radius: 20px; border-left: 6px solid var(--accent); line-height: 1.6; }
+        .total-display { text-align: center; padding: 30px 0; }
+        .total-display strong { font-size: 38px; color: var(--primary); display: block; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="header">
-        <h1>Simulador de Orçamento</h1>
-    </div>
+    <div class="header"><h1>Simulador Elite</h1></div>
 
     <div id="step1" class="step active">
         <label>Nome do Cliente</label>
-        <input type="text" id="nome" placeholder="Seu nome completo">
+        <input type="text" id="nome" placeholder="Seu nome">
         
         <label>Cidade do Evento</label>
-        <input list="cidades" id="cidade" class="input-full" placeholder="Cidade (Saída de Varginha)">
+        <input list="cidades" id="cidade" class="input-full" placeholder="Selecione a cidade em MG">
         <datalist id="cidades">
-            <option value="Varginha"><option value="Elói Mendes"><option value="Três Corações"><option value="Alfenas"><option value="Lavras"><option value="Pouso Alegre"><option value="Poços de Caldas"><option value="Três Pontas">
-        </datalist>
+            </datalist>
 
-        <label>Local (Salão/Sítio)</label>
-        <input type="text" id="local" placeholder="Ex: Vila Garden">
+        <label>Local do Evento</label>
+        <input type="text" id="local" placeholder="Ex: Salão de Festas">
 
         <button class="btn-next" onclick="nextStep(2)">Próximo</button>
     </div>
 
     <div id="step2" class="step">
-        <div class="slider-label"><span>Convidados Estimados</span> <span id="label-pessoas" style="color:var(--accent)">50</span></div>
+        <div class="slider-label"><span>Convidados</span> <span id="label-pessoas" style="color:var(--accent)">50</span></div>
         <input type="range" id="pessoas" min="50" max="1000" step="10" value="50" oninput="updateRange('label-pessoas', this.value)">
 
-        <label>Ambiente do Evento</label>
+        <label>Ambiente</label>
         <div class="grid-options">
             <div class="btn-option" onclick="selectBtn(this, 'ambiente', 'Interno')">Interno</div>
             <div class="btn-option" onclick="selectBtn(this, 'ambiente', 'Externo')">Externo</div>
         </div>
-
-        <label>Tipo de Comemoração</label>
-        <div class="grid-options">
-            <div class="btn-option" onclick="selectBtn(this, 'tipo', 'Casamento')">Casamento</div>
-            <div class="btn-option" onclick="selectBtn(this, 'tipo', 'Corporativo')">Corporativo</div>
-            <div class="btn-option" onclick="selectBtn(this, 'tipo', 'Aniversário')">Aniversário</div>
-            <div class="btn-option" onclick="selectBtn(this, 'tipo', 'Outro')">Outro</div>
-        </div>
-
-        <button class="btn-next" onclick="nextStep(3)">Escolher Opcionais</button>
+        <button class="btn-next" onclick="nextStep(3)">Continuar</button>
     </div>
 
     <div id="step3" class="step">
-        <label>Itens Adicionais (Opcional)</label>
+        <label>Opcionais</label>
         <label class="checkbox-item" onclick="this.classList.toggle('selected')"><input type="checkbox" id="add-led"> Painel de LED 4x2m</label>
-        <label class="checkbox-item" onclick="this.classList.toggle('selected')"><input type="checkbox" id="add-pista"> Pista de Dança Paris</label>
+        <label class="checkbox-item" onclick="this.classList.toggle('selected')"><input type="checkbox" id="add-pista"> Pista Paris</label>
         <label class="checkbox-item" onclick="this.classList.toggle('selected')"><input type="checkbox" id="add-luz"> Iluminação Cênica</label>
         
-        <button class="btn-next" onclick="gerarOrcamento()">Ver Orçamento Final</button>
+        <button class="btn-next" onclick="gerarOrcamento()">Calcular Tudo</button>
     </div>
 
     <div id="stepFinal" class="step">
         <div class="summary-card" id="resumo"></div>
         <div class="total-display">
-            <span style="text-transform:uppercase; font-size:12px; color:#888;">Investimento Total</span>
+            <span style="font-size:12px; color:#888;">VALOR TOTAL ESTIMADO</span>
             <strong id="total-final">R$ 0,00</strong>
         </div>
-        <button class="btn-next btn-whatsapp" onclick="enviarZap()">Confirmar Data via WhatsApp</button>
-        <button class="btn-next" style="background:none; color:#bbb; font-size:11px;" onclick="location.reload()">Refazer Simulação</button>
+        <button class="btn-next btn-whatsapp" onclick="enviarZap()">Enviar para WhatsApp</button>
+        <button class="btn-next" style="background:none; color:#bbb; font-size:11px; margin-top:10px;" onclick="location.reload()">Nova Simulação</button>
     </div>
-
-    <div class="footer-brand">Elite Produções Audiovisuais</div>
 </div>
 
 <script>
-    let choices = { ambiente: '', tipo: '' };
-    const dists = {"Varginha": 0, "Elói Mendes": 15, "Três Corações": 30, "Alfenas": 65, "Pouso Alegre": 110};
+    let choices = { ambiente: '' };
+    
+    // BASE DE DADOS COMPLETA (Distância em KM de Varginha)
+    const dbCidades = {
+        "Aiuruoca": 130, "Alfenas": 65, "Alpinópolis": 210, "Alterosa": 100, "Andrelândia": 160, "Andradas": 170, "Arantina": 185, "Areado": 85, "Baependi": 95, "Bandeira do Sul": 140, "Boa Esperança": 75, "Bocaina de Minas": 220, "Bom Jardim de Minas": 200, "Bom Repouso": 145, "Bom Sucesso": 110, "Borda da Mata": 135, "Botelhos": 125, "Brasópolis": 140, "Bueno Brandão": 180, "Cabo Verde": 145, "Cachoeira de Minas": 130, "Caldas": 150, "Camanducaia": 180, "Cambuquira": 45, "Campanha": 40, "Campestre": 120, "Campo do Meio": 90, "Campos Gerais": 75, "Cana Verde": 100, "Candeias": 125, "Capetinga": 270, "Capitólio": 190, "Carmo da Cachoeira": 35, "Carmo de Minas": 90, "Carmo do Rio Claro": 125, "Carrancas": 140, "Carvalhópolis": 95, "Cássia": 260, "Caxambu": 85, "Claraval": 330, "Conceição da Aparecida": 140, "Conceição das Pedras": 120, "Conceição do Rio Verde": 65, "Conceição dos Ouros": 145, "Congonhal": 110, "Coqueiral": 85, "Cordislândia": 50, "Cristina": 110, "Cruzília": 115, "Delfim Moreira": 170, "Delfinópolis": 300, "Divisa Nova": 95, "Dom Viçoso": 120, "Elói Mendes": 15, "Espírito Santo do Dourado": 120, "Estiva": 135, "Extrema": 230, "Fama": 70, "Guapé": 115, "Guaranésia": 190, "Guaxupé": 180, "Heliodora": 95, "Ibiraci": 320, "Ibitiúra de Minas": 160, "Ijaci": 90, "Ilicínea": 105, "Inconfidentes": 155, "Ingai": 95, "Ipuiúna": 120, "Itajubá": 145, "Itamogi": 240, "Itamonte": 160, "Itanhandu": 150, "Itapeva": 210, "Itaú de Minas": 230, "Itumirim": 100, "Itutinga": 115, "Jacuí": 210, "Jacutinga": 190, "Jesuânia": 75, "Juruaia": 170, "Lambari": 65, "Lavras": 75, "Liberdade": 180, "Luminárias": 120, "Machado": 75, "Maria da Fé": 130, "Minduri": 170, "Monsenhor Paulo": 35, "Monte Belo": 135, "Monte Sião": 195, "Munhoz": 200, "Muzambinho": 165, "Natércia": 100, "Nepomuceno": 85, "Nova Resende": 160, "Olímpio Noronha": 75, "Ouro Fino": 160, "Paraguaçu": 55, "Paraisópolis": 160, "Passa Quatro": 180, "Passa Tempo": 180, "Passos": 220, "Pedralva": 130, "Perdões": 100, "Pimenta": 195, "Piranguçu": 160, "Piranguinho": 135, "Poço Fundo": 105, "Poços de Caldas": 160, "Pouso Alegre": 110, "Pouso Alto": 130, "Pratápolis": 240, "Santa Rita de Caldas": 140, "Santa Rita do Sapucaí": 130, "Santana da Vargem": 45, "Santana do Jacaré": 135, "Santo Antônio do Amparo": 120, "São Bento Abade": 65, "São Gonçalo do Sapucaí": 55, "São João Batista do Glória": 230, "São João da Mata": 110, "São Lourenço": 100, "São Pedro da União": 200, "São Sebastião da Bela Vista": 120, "São Sebastião do Paraíso": 250, "São Thomé das Letras": 85, "São Tomás de Aquino": 270, "São Vicente de Minas": 160, "Senador Amaral": 170, "Senador José Bento": 110, "Serrania": 95, "Serranos": 170, "Silvianópolis": 100, "Soledade de Minas": 105, "Três Corações": 30, "Três Pontas": 32, "Turvolândia": 85, "Varginha": 0, "Virgínia": 140, "Wenceslau Braz": 160
+    };
+
+    // Preenche o datalist automaticamente
+    const datalist = document.getElementById('cidades');
+    Object.keys(dbCidades).sort().forEach(c => {
+        let opt = document.createElement('option');
+        opt.value = c;
+        datalist.appendChild(opt);
+    });
 
     function nextStep(n) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
@@ -213,73 +116,55 @@
     function updateRange(id, val) { document.getElementById(id).innerText = val; }
 
     function gerarOrcamento() {
+        const pessoas = parseInt(document.getElementById('pessoas').value);
+        const cidadeNome = document.getElementById('cidade').value;
+        const km = dbCidades[cidadeNome] || 100; // 100 padrão se não achar
+        
+        // 1. Cálculo do Som (PA)
         let totalSom = 0;
         let setupPA = "";
-        const pessoas = parseInt(document.getElementById('pessoas').value);
-        const ambiente = choices.ambiente;
+        let fator = choices.ambiente === 'Externo' ? pessoas * 1.4 : pessoas;
 
-        // Lógica de PA (Oculta do cliente)
-        let fatorPessoas = ambiente === 'Externo' ? pessoas * 1.4 : pessoas;
-
-        if (fatorPessoas <= 50) { totalSom = 1000; setupPA = "PA 1x1 (Até 50 pessoas)"; }
-        else if (fatorPessoas <= 120) { totalSom = 2250; setupPA = "PA 2x2 (Até 120 pessoas)"; }
-        else if (fatorPessoas <= 250) { totalSom = 4000; setupPA = "PA 3x3 (Até 250 pessoas)"; }
-        else if (fatorPessoas <= 500) { totalSom = 6250; setupPA = "PA 4x4 (Até 500 pessoas)"; }
-        else if (fatorPessoas <= 750) { totalSom = 8750; setupPA = "PA 5x5 (Até 700 pessoas)"; }
-        else { totalSom = 12500; setupPA = "PA 6x6 (1000+ pessoas)"; }
+        if (fator <= 50) { totalSom = 1000; setupPA = "PA 1x1"; }
+        else if (fator <= 120) { totalSom = 2250; setupPA = "PA 2x2"; }
+        else if (fator <= 250) { totalSom = 4000; setupPA = "PA 3x3"; }
+        else if (fator <= 500) { totalSom = 6250; setupPA = "PA 4x4"; }
+        else if (fator <= 750) { totalSom = 8750; setupPA = "PA 5x5"; }
+        else { totalSom = 12500; setupPA = "PA 6x6"; }
 
         let totalGeral = totalSom;
-        let listaAdicionaisZap = "";
+        let descTecnica = `\n- Som: ${setupPA}`;
 
-        // Adicionais com descrição técnica para você
-        if (document.getElementById('add-led').checked) {
-            totalGeral += 1800;
-            listaAdicionaisZap += "\n- Painel LED 4x2m";
-        }
-        if (document.getElementById('add-pista').checked) {
-            totalGeral += 1200;
-            listaAdicionaisZap += "\n- Pista de Dança Paris";
-        }
-        if (document.getElementById('add-luz').checked) {
-            totalGeral += 800;
-            // Descrição específica que você pediu (apenas para o WhatsApp)
-            listaAdicionaisZap += "\n- Iluminação Cênica Completa (4 Movings 9r, 6 Strobos RGB, 6 Par Leds, 2 Cobs)";
-        }
+        // 2. Adicionais
+        if (document.getElementById('add-led').checked) { totalGeral += 1800; descTecnica += "\n- Painel LED 4x2m"; }
+        if (document.getElementById('add-pista').checked) { totalGeral += 1200; descTecnica += "\n- Pista Paris"; }
+        if (document.getElementById('add-luz').checked) { totalGeral += 800; descTecnica += "\n- Iluminação Cênica Completa (4 Movings 9r, 6 Strobos RGB, 6 Par Leds, 2 Cobs)"; }
 
-        // Frete
-        const cidade = document.getElementById('cidade').value;
-        const km = dists[cidade] || 80;
-        totalGeral += (km * 2 / 9) * 6.2 + (km > 40 ? 60 : 0);
-
-        // Exibição Final
-        document.getElementById('total-final').innerText = totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        // 3. DESLOCAMENTO (GASOLINA + PEDÁGIO EPR)
+        const kmTotal = km * 2; // Ida e Volta
+        const custoGasosa = (kmTotal / 9) * 6.20;
         
-        document.getElementById('resumo').innerHTML = `
-            <strong>Olá, ${document.getElementById('nome').value}!</strong><br>
-            Calculamos a estrutura ideal para o seu <strong>${choices.tipo}</strong> no local <strong>${document.getElementById('local').value || 'informado'}</strong>.<br><br>
-            Para atender <strong>${pessoas} pessoas</strong> em ambiente <strong>${ambiente}</strong>, preparamos um orçamento completo com montagem e logística inclusas.
-        `;
+        // Lógica Pedágio: 1 pedágio (ida e volta) a cada 50km de distância
+        let numPedagios = Math.floor(km / 50) * 2; 
+        if (km > 10 && numPedagios == 0) numPedagios = 2; // Mínimo de 1 pra cidades vizinhas com praça
+        const custoPedagio = numPedagios * 13.10; 
+        
+        const totalDeslocamento = custoGasosa + custoPedagio;
+        totalGeral += totalDeslocamento;
 
-        // Mensagem Interna para o seu WhatsApp
-        choices.resumoZap = `*SIMULAÇÃO ELITE - NOVO LEAD*\n\n` +
-            `*Cliente:* ${document.getElementById('nome').value}\n` +
-            `*Cidade/Local:* ${cidade} - ${document.getElementById('local').value}\n` +
-            `*Evento:* ${choices.tipo} (${pessoas} pessoas)\n` +
-            `*Ambiente:* ${ambiente}\n\n` +
-            `*CONFIGURAÇÃO TÉCNICA:*` +
-            `\n- Som: ${setupPA}` +
-            `${listaAdicionaisZap}\n\n` +
-            `*VALOR TOTAL:* ${totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`;
+        // Exibição
+        document.getElementById('total-final').innerText = totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('resumo').innerHTML = `Olá <strong>${document.getElementById('nome').value}</strong>!<br>Preparamos uma estrutura completa para seu evento em <strong>${cidadeNome}</strong>.<br><br>Logística e montagem já inclusas no valor final.`;
+
+        choices.resumoZap = `*NOVO ORÇAMENTO ELITE*\n\n*Cliente:* ${document.getElementById('nome').value}\n*Local:* ${document.getElementById('local').value} (${cidadeNome})\n*Convidados:* ${pessoas}\n*Ambiente:* ${choices.ambiente}\n\n*ESTRUTURA:*${descTecnica}\n\n*LOGÍSTICA:* ${totalDeslocamento.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}\n*TOTAL:* ${totalGeral.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}`;
 
         nextStep('Final');
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#D4AF37', '#1a1a1a'] });
     }
 
     function enviarZap() {
-        const meuFone = "5535991565909";
-        window.open(`https://wa.me/${meuFone}?text=${encodeURIComponent(choices.resumoZap)}`, '_blank');
+        window.open(`https://wa.me/5535991565909?text=${encodeURIComponent(choices.resumoZap)}`, '_blank');
     }
 </script>
-
 </body>
 </html>
