@@ -156,7 +156,7 @@
         document.getElementById('total-final').innerText = totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         document.getElementById('resumo').innerHTML = `Olá <strong>${document.getElementById('nome').value}</strong>!<br>Preparamos uma estrutura completa para seu evento em <strong>${cidadeNome}</strong>.<br><br>Logística e montagem já inclusas no valor final.`;
 
-        choices.resumoZap = `*NOVO ORÇAMENTO ELITE*\n\n*Cliente:* ${document.getElementById('nome').value}\n*Local:* ${document.getElementById('local').value} (${cidadeNome})\n*Convidados:* ${pessoas}\n*Ambiente:* ${choices.ambiente}\n\n*ESTRUTURA:*${descTecnica}\n\n*LOGÍSTICA:* ${totalDeslocamento.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}\n*TOTAL:* ${totalGeral.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}`;
+        choices.resumoZap = `*NOVO ORÇAMENTO - LEAD*\n\n*Cliente:* ${document.getElementById('nome').value}\n*Local:* ${document.getElementById('local').value} (${cidadeNome})\n*Convidados:* ${pessoas}\n*Ambiente:* ${choices.ambiente}\n\n*ESTRUTURA:*${descTecnica}\n\n*LOGÍSTICA:* ${totalDeslocamento.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}\n*TOTAL:* ${totalGeral.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}`;
 
         nextStep('Final');
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#D4AF37', '#1a1a1a'] });
